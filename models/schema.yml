@@ -74,3 +74,39 @@ sources:
       - name: facebook
         identifier: raw_gz_facebook
         description: "Facebook Ads kampanyalarının günlük reklam verisi."
+
+models:
+  - name: int_campaigns
+    description: "Dört reklam platformunun (Adwords, Bing, Criteo, Facebook) günlük kampanya verisinin birleşimi. Her satır bir kampanyanın bir günlük verisidir."
+    data_tests:
+      - unique:
+          column_name: "concat(cast(date_date as string), '_', campaign_key)"
+    columns:
+      - name: date_date
+        description: "Kampanya verisinin tarihi."
+        data_tests:
+          - not_null
+      - name: paid_source
+        description: "Reklam platformu."
+        data_tests:
+          - not_null
+      - name: campaign_key
+        description: "Kampanyanın kimliği."
+        data_tests:
+          - not_null
+      - name: campaign_name
+        description: "Kampanyanın adı."
+        data_tests:
+          - not_null
+      - name: ads_cost
+        description: "Günlük reklam harcaması."
+        data_tests:
+          - not_null
+      - name: impression
+        description: "Günlük gösterim sayısı."
+        data_tests:
+          - not_null
+      - name: click
+        description: "Günlük tıklama sayısı."
+        data_tests:
+          - not_null
