@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: raw
     schema: gz_raw_data
-    description: "Greenweez'in ham verileri: satışlar, ürünler ve kargo bilgileri."
+    description: "Greenweez'in ham verileri: satışlar, ürünler, kargo ve reklam bilgileri."
     tables:
       - name: sales
         identifier: raw_gz_sales
@@ -58,3 +58,83 @@ sources:
             description: "Siparişin lojistik maliyeti (depolama, paketleme)."
           - name: ship_cost
             description: "Şirketin kargo firmasına ödediği tutar."
+
+      - name: adwords
+        identifier: raw_gz_adwords
+        description: "Google Ads kampanyalarının günlük reklam verisi."
+
+      - name: bing
+        identifier: raw_gz_bing
+        description: "Bing Ads kampanyalarının günlük reklam verisi."
+
+      - name: criteo
+        identifier: raw_gz_criteo
+        description: "Criteo kampanyalarının günlük reklam verisi."
+
+      - name: facebook
+        identifier: raw_gz_facebook
+        description: "Facebook Ads kampanyalarının günlük reklam verisi."
+
+models:
+  - name: int_campaigns
+    description: "Dört reklam platformunun (Adwords, Bing, Criteo, Facebook) günlük kampanya verisinin birleşimi. Her satır bir kampanyanın bir günlük verisidir."
+    data_tests:
+      - unique:
+          column_name: "concat(cast(date_date as string), '_', campaign_key)"
+    columns:
+      - name: date_date
+        description: "Kampanya verisinin tarihi."
+        data_tests:
+          - not_null
+      - name: paid_source
+        description: "Reklam platformu."
+        data_tests:
+          - not_null
+      - name: campaign_key
+        description: "Kampanyanın kimliği."
+        data_tests:
+          - not_null
+      - name: campaign_name
+        description: "Kampanyanın adı."
+        data_tests:
+          - not_null
+      - name: ads_cost
+        description: "Günlük reklam harcaması."
+        data_tests:
+          - not_null
+      - name: impression
+        description: "Günlük gösterim sayısı."
+        data_tests:
+          - not_null
+      - name: click
+        description: "Günlük tıklama sayısı."
+        data_tests:
+          - not_null
+  - name: int_campaigns_day
+    description: "Dört reklam platformunun günlük toplam reklam verisi. Her satır bir gündür."
+    columns:
+      - name: date_date
+        description: "Tarih. Tablonun birincil anahtarı."
+        data_tests:
+          - unique
+          - not_null
+      - name: ads_cost
+        description: "O günün toplam reklam harcaması."
+        data_tests:
+          - not_null
+      - name: ads_impression
+        description: "O günün toplam gösterim sayısı."
+        data_tests:
+          - not_null
+      - name: ads_clicks
+        description: "O günün toplam tıklama sayısı."
+        data_tests:
+          - not_null   
+  - name: finance_campaigns_month
+    description: "finance_campaigns_day'in aylık toplamı. Her satır bir aydır."
+    columns:
+      - name: datemonth
+        description: "Ayın ilk günü. Tablonun birincil anahtarı."
+        data_tests:
+          - unique
+          - not_null         
