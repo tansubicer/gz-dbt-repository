@@ -1,0 +1,60 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: gz_raw_data
+    description: "Greenweez'in ham verileri: satışlar, ürünler ve kargo bilgileri."
+    tables:
+      - name: sales
+        identifier: raw_gz_sales
+        description: "Satış satırları. Her satır bir siparişteki bir ürünü temsil eder."
+        config:
+          loaded_at_field: "cast(date_date as timestamp)"
+          freshness:
+            warn_after:
+              count: 90
+              period: day
+        data_tests:
+          - unique:
+              column_name: "concat(cast(orders_id as string), '_', cast(pdt_id as string))"
+        columns:
+          - name: date_date
+            description: "Siparişin verildiği tarih."
+          - name: orders_id
+            description: "Siparişin kimliği."
+          - name: pdt_id
+            description: "Ürünün kimliği."
+          - name: revenue
+            description: "Bu ürün satırından elde edilen ciro."
+          - name: quantity
+            description: "Siparişteki ürün adedi."
+
+      - name: product
+        identifier: raw_gz_product
+        description: "Ürün kataloğu ve alış fiyatları."
+        columns:
+          - name: products_id
+            description: "Ürünün kimliği. Tablonun birincil anahtarı."
+            data_tests:
+              - unique
+              - not_null
+          - name: purchse_price
+            description: "Ürünün birim alış fiyatı."
+
+      - name: ship
+        identifier: raw_gz_ship
+        description: "Siparişlere ait kargo ve lojistik maliyetleri."
+        columns:
+          - name: orders_id
+            description: "Siparişin kimliği. Tablonun birincil anahtarı."
+            data_tests:
+              - unique
+              - not_null
+          - name: shipping_fee
+            description: "Müşterinin ödediği kargo ücreti."
+          - name: shipping_fee_1
+            description: "shipping_fee ile birebir aynı, kopya sütun."
+          - name: logcost
+            description: "Siparişin lojistik maliyeti (depolama, paketleme)."
+          - name: ship_cost
+            description: "Şirketin kargo firmasına ödediği tutar."
