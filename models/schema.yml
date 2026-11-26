@@ -129,4 +129,12 @@ models:
       - name: ads_clicks
         description: "O günün toplam tıklama sayısı."
         data_tests:
-          - not_null      
+          - not_null   
+  - name: finance_campaigns_month
+    description: "finance_campaigns_day'in aylık toplamı. Her satır bir aydır."
+    columns:
+      - name: datemonth
+        description: "Ayın ilk günü. Tablonun birincil anahtarı."
+        data_tests:
+          - unique
+          - not_null         
